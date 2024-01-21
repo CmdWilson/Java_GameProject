@@ -9,10 +9,11 @@ abstract public class HeroBase implements Game {
     protected double criticalChance, evasion;
     protected Coordinates position;
     protected boolean liveStatus;
+    protected String actions;
 
 
-    protected HeroBase(String name, int maxHp, int hp, int armor, int damage,
-                       int initiative, double criticalChance, double evasion, int x, int y, boolean liveStatus) {
+    protected HeroBase(String name, int maxHp, int hp, int armor, int damage, int initiative,
+                       double criticalChance, double evasion, int x, int y, boolean liveStatus, String actions) {
         this.name = name;
         this.maxHp = maxHp;
         this.hp = hp;
@@ -23,12 +24,15 @@ abstract public class HeroBase implements Game {
         this.evasion = evasion;
         this.position = new Coordinates(x, y);
         this.liveStatus = liveStatus;
+        this.actions = "";
     }
 
+    static Random random = new Random();
     public float getDistance(HeroBase enemy) {
         return position.distance(enemy.position);
     }
-    public int getInitiative(){
+
+    public int getInitiative() {
         return this.initiative;
     }
 
@@ -36,15 +40,23 @@ abstract public class HeroBase implements Game {
         return this.liveStatus;
     }
 
-    public String getType(){
+    public String getType() {
         return this.getClass().getSimpleName();
     }
 
-    public HeroBase getNearestEnemy(ArrayList<HeroBase> enemies){
+    public int[] getPosition() {
+        return new int[]{position.x, position.y};
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public HeroBase getNearestEnemy(ArrayList<HeroBase> enemies) {
         HeroBase nearestEnemy = null;
         for (HeroBase enemy : enemies) {
             if (enemy.liveStatus) {
-                if (nearestEnemy == null || position.distance(enemy.position) < position.distance(nearestEnemy.position) ) {
+                if (nearestEnemy == null || position.distance(enemy.position) < position.distance(nearestEnemy.position)) {
                     nearestEnemy = enemy;
                 }
             }
@@ -52,34 +64,52 @@ abstract public class HeroBase implements Game {
         return nearestEnemy;
     }
 
+    public boolean emptyStep(ArrayList<HeroBase> allies, Coordinates newPosition) {
+        boolean step = true;
+        for (HeroBase ally : allies) {
+            if (ally.position.equals(newPosition)) {
+                step = false;
+                break;
+            }
+
+        }
+        return step;
+    }
+
+    public double dice(){
+        return random.nextDouble(0.8,1.2);
+    }
+
     public int calculateDamage(HeroBase self, HeroBase enemy) {
-        Random random = new Random();
         int criticalDamage = 1;
         int evaletionEffect = 1;
         double randomCritValue = random.nextDouble();
         if (randomCritValue <= self.criticalChance) criticalDamage = 2;
         double randomEvValue = random.nextDouble();
         if (randomEvValue <= enemy.evasion) evaletionEffect = 10;
-        return (int) ((self.damage * criticalDamage) * (100 - enemy.armor) * 0.01 / evaletionEffect);
+        return (int) (dice() * ((self.damage * criticalDamage) * (100 - enemy.armor) * 0.01 / evaletionEffect));
     }
 
 
-    public void getDamage(int currentDamage){
+    public void getDamage(int currentDamage) {
         if (!this.liveStatus) return;
-        this.hp -=currentDamage;
-        if (this.hp <= 0){
+        this.hp -= currentDamage;
+        if (this.hp <= 0) {
             this.hp = 0;
             this.liveStatus = false;
         }
     }
 
+    public int getHealthReport() {
+        return this.maxHp - this.hp;
+    }
+
     @Override
     public String toString() {
-        return (name + position + " HP= " + hp);
+        return (name + position + " ♥ " + maxHp + "/" + hp);
     }
 
     @Override
     public void step(ArrayList<HeroBase> enemies, ArrayList<HeroBase> allies) {
-
     }
 }
