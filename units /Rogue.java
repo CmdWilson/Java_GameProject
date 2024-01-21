@@ -8,14 +8,14 @@ public class Rogue extends Melee {
 
     public Rogue(String name, int x, int y) {
         super(name, 300, 300, 30,
-                70, 2, 0.1, 0.1, x, y, true);
+                70, 2, 0.1, 0.1, x, y, true, "");
         invisibleStatus = 0;
         baseevasion = 0.1;
     }
 
     @Override
     public String toString() {
-        return ("Rogue: " + super.toString());
+        return ("Rogue " + super.toString()) + " Act: " + actions;
     }
 
     @Override
@@ -24,10 +24,10 @@ public class Rogue extends Melee {
         super.step(enemies, allies);
         invisibleStatus = 0;
         evasion = baseevasion;
-        if (curentPosition != this.position){
-            invisibleStatus= 1;
+        if (curentPosition != this.position) {
+            invisibleStatus = 1;
             evasion += 0.9 * invisibleStatus;
-            System.out.println(this + " became invisible ");
+//            System.out.println(" and became invisible ");
         }
     }
 }
