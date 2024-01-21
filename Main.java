@@ -3,20 +3,21 @@ import units.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         int numberOfTeams = 10;
         createTeams(numberOfTeams);
-        ArrayList<HeroBase> heroOrder = new ArrayList<>();
         heroOrder.addAll(lightSide);
         heroOrder.addAll(darkSide);
         heroOrder.sort(Comparator.comparingInt(HeroBase::getInitiative));
 
-//        a temporary solution for checking the algorithms operation
-        int step = 0;
+        Scanner scanner = new Scanner(System.in);
+        int steps = 0;
         while (true) {
-            step++;
+            View.view();
+//            scanner.nextLine();
             if (containsElements(heroOrder, lightSide)) {
                 System.out.println("Darkside team WIN!!!");
                 break;
@@ -25,8 +26,12 @@ public class Main {
                 System.out.println("Lightside team WIN!!!");
                 break;
             }
-            System.out.println("Step № " + step + "--------------------------------");
+            if (steps == 200) {
+                System.out.println("Draw!!!");
+                break;
+            }
             heroOrder = teemSteps(heroOrder);
+            steps++;
         }
     }
 
@@ -56,15 +61,9 @@ public class Main {
 
     static void createTeams(int numbers) {
         for (int i = 0; i < numbers; i++) {
-            darkSide.add(getRandomHero(random.nextInt(3, 7), numbers - 1, i));
-            lightSide.add(getRandomHero(random.nextInt(4), 0, i));
-
-
+            darkSide.add(getRandomHero(random.nextInt(3, 7), i + 1, numbers));
+            lightSide.add(getRandomHero(random.nextInt(4), i + 1, 1));
         }
-    }
-
-    static void showTeam(ArrayList<HeroBase> team) {
-        team.forEach(n -> System.out.println(n.toString()));
     }
 
     static HeroBase getRandomHero(int choice, int x, int y) {
@@ -72,8 +71,8 @@ public class Main {
             case 0 -> new Monk(getName(), x, y);
             case 1 -> new Pikeman(getName(), x, y);
             case 2 -> new Crossbowman(getName(), x, y);
-            case 3 -> new Peasant(getName(), x, y);
-            case 4 -> new Sorcerer(getName(), x, y);
+            case 3 -> new Apprentice(getName(), x, y);
+            case 4 -> new Wizzard(getName(), x, y);
             case 5 -> new Rogue(getName(), x, y);
             case 6 -> new Sniper(getName(), x, y);
             default -> null;
@@ -83,4 +82,5 @@ public class Main {
     static Random random = new Random();
     static ArrayList<HeroBase> darkSide = new ArrayList<>();
     static ArrayList<HeroBase> lightSide = new ArrayList<>();
+    public static ArrayList<HeroBase> heroOrder = new ArrayList<>();
 }
