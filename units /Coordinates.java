@@ -21,4 +21,9 @@ public class Coordinates {
         Coordinates enemyCoordinates = enemy.position;
         return new Coordinates(this.x - enemyCoordinates.x,this.y - enemyCoordinates.y );
     }
+
+
+    public boolean equals(Coordinates newCoordinates) {
+        return this.x == newCoordinates.x && this.y == newCoordinates.y;
+    }
 }
