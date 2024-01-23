@@ -28,6 +28,7 @@ abstract public class HeroBase implements Game {
     }
 
     static Random random = new Random();
+
     public float getDistance(HeroBase enemy) {
         return position.distance(enemy.position);
     }
@@ -67,17 +68,17 @@ abstract public class HeroBase implements Game {
     public boolean emptyStep(ArrayList<HeroBase> allies, Coordinates newPosition) {
         boolean step = true;
         for (HeroBase ally : allies) {
+            if (!ally.liveStatus) continue;
             if (ally.position.equals(newPosition)) {
                 step = false;
                 break;
             }
-
         }
         return step;
     }
 
-    public double dice(){
-        return random.nextDouble(0.8,1.2);
+    public double dice() {
+        return random.nextDouble(0.8, 1.2);
     }
 
     public int calculateDamage(HeroBase self, HeroBase enemy) {
@@ -93,11 +94,48 @@ abstract public class HeroBase implements Game {
 
     public void getDamage(int currentDamage) {
         if (!this.liveStatus) return;
+        if (currentDamage == 0) currentDamage = 1;
         this.hp -= currentDamage;
         if (this.hp <= 0) {
             this.hp = 0;
             this.liveStatus = false;
         }
+    }
+
+    public void getDamageNearestEnemy(HeroBase enemy, int currentDamage){
+        if (currentDamage == 0) currentDamage = 1;
+        if (currentDamage > enemy.hp) currentDamage = enemy.hp;
+        enemy.getDamage(currentDamage);
+        if (!enemy.getLiveStatus())
+            this.actions = "kill " + enemy.name + " " + currentDamage + " dmg";
+        else
+            this.actions = "atk " + enemy.name + " " + currentDamage + " dmg";
+    }
+
+    protected Coordinates moveTo(HeroBase enemy) {
+        Coordinates delta = position.deltaCoordinates(enemy);
+        Coordinates destanation = new Coordinates(position.x, position.y);
+        if (delta.y < 0) {
+            destanation.y++;
+            actions = "go ►►► " + enemy.name;
+            return destanation;
+        }
+        if (delta.y > 0) {
+            destanation.y--;
+            actions = "go ◄◄◄ " + enemy.name;
+            return destanation;
+        }
+        if (delta.x < 0) {
+            destanation.x++;
+            actions = "go ▼▼▼ " + enemy.name;
+            return destanation;
+        }
+        if (delta.x > 0) {
+            destanation.x--;
+            actions = "go ▲▲▲ " + enemy.name;
+            return destanation;
+        }
+        return destanation;
     }
 
     public int getHealthReport() {
@@ -106,7 +144,7 @@ abstract public class HeroBase implements Game {
 
     @Override
     public String toString() {
-        return (name + position + " ♥ " + maxHp + "/" + hp);
+        return (name + position + " ♥" + maxHp + "/" + hp);
     }
 
     @Override
