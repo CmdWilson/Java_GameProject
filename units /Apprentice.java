@@ -34,27 +34,30 @@ public class Apprentice extends HeroBase {
 
     @Override
     public String toString() {
-        return ("Apprentice " + super.toString() + " Act: " + actions);
+        return ("Apprentice " + super.toString() + ": " + actions);
     }
 
     @Override
     public void step(ArrayList<HeroBase> enemies, ArrayList<HeroBase> allies) {
         if (!this.getLiveStatus()) {
-            this.actions =  " is dead  ...";
+            this.actions =  "is dead  ...";
             return;
         }
         ArrayList<Archer> alliesArchers = findAllArcher(allies);
-        if (alliesArchers.isEmpty()) return;
+        if (alliesArchers.isEmpty()) {
+            actions = "don't find any archer and do nothing";
+            return;
+        }
         Archer target = findBestChoice(alliesArchers);
         int quantity = 1;
         if (target.getType().equals("Crossbowman")) quantity = 2;
         target.arrows += quantity;
-        actions = " add " + quantity + " arrow(s) to " + target.name;
+        actions = "add " + quantity + "↑ to " + target.name;
         HeroBase enemy = getNearestEnemy(enemies);
         if (enemy == null) return;
         if (this.getDistance(enemy) < 2) {
             enemy.getDamage(calculateDamage(this, enemy));
-            actions = " attack " + enemy.getType() + enemy.name + " with dmg= " + calculateDamage(this, enemy);
+            actions = "atk " +  enemy.name + " " + calculateDamage(this, enemy) + " dmg";
         }
     }
 }
