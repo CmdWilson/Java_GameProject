@@ -14,8 +14,8 @@ public class Pikeman extends Melee {
 
     @Override
     public String toString() {
-        if (shieldStatus == 1) return ("Pikeman " + super.toString()) + " ♦"  + " Act: " + actions;
-        else return ("Pikeman " + super.toString()) + " Act: " + actions;
+        if (shieldStatus == 1) return ("Shielded Pikeman " + super.toString()) + ": " + actions;
+        else return ("Pikeman " + super.toString()) + ": " + actions;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class Pikeman extends Melee {
         if (curentPosition != this.position) {
             shieldStatus = 1;
             armor += armor * shieldStatus;
-//            System.out.println(" and raised his shield ");
+            actions += " and raises shield ";
         }
     }
 }
