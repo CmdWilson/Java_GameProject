@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Magician extends HeroBase {
-    protected int mp;
+    protected int mp, maxMp;
 
     public Magician(String name, int maxHp, int hp, int armor, int damage, int initiative,
                     double criticalChance, double evasion, int x, int y, boolean liveStatus, String actions) {
@@ -35,16 +35,62 @@ public class Magician extends HeroBase {
         return currentHeal;
     }
 
+    public ArrayList<Melee> findMelee(ArrayList<HeroBase> allies) {
+        ArrayList<Melee> melee = new ArrayList<>();
+        for (HeroBase ally : allies) {
+                if (ally.getType().equals("Pikeman") || ally.getType().equals("Rogue")) {
+                    melee.add((Melee) ally);
+            }
+        }
+        return melee;
+    }
+
+    public void restoreMp(int value){
+        mp += value ;
+        if (mp > maxMp) mp = maxMp;
+        actions = "Restores " + value + " pt of his mana";
+    }
+
+    public boolean allMeleeDead(ArrayList<Melee> melee){
+        for (Melee heroBase : melee) {
+            if (heroBase.liveStatus) return false;
+        }
+        return true;
+    }
+
+    public boolean isPositionEmpty(ArrayList<HeroBase> enemies, Coordinates deadHeroCoord){
+        for (HeroBase enemy : enemies) {
+            if (enemy.position.equals(deadHeroCoord)) return false;
+        }
+        return true;
+    }
+
     @Override
     public void step(ArrayList<HeroBase> enemies, ArrayList<HeroBase> allies) {
         if (!this.getLiveStatus()) {
-            this.actions =  " is dead ...";
+            this.actions =  "is dead ...";
             return;
         }
-        if (mp <20) {
-            mp += 60;
-            actions = "Restores half of his mana";
+        if (mp < maxMp / 6) {
+            restoreMp(maxMp /2 );
             return;
+        }
+        ArrayList<Melee> melee = findMelee(allies);
+        if (allMeleeDead(findMelee(allies))){
+            if (mp < maxMp){
+                restoreMp( maxMp /2 );
+                return;
+            }
+            for (Melee target : melee) {
+                if (!isPositionEmpty(enemies,target.position)){
+                    continue;
+                }
+                target.liveStatus = true;
+                target.hp = target.maxHp / 2;
+                actions = "resurrected " + target.getType() + target.name;
+                this.mp = 0;
+                return;
+            }
         }
         HeroBase ally = getMostDamaged(allies);
         if (ally == null) return;
@@ -54,7 +100,7 @@ public class Magician extends HeroBase {
             return;
         }
         ally.getDamage(currentHeal);
-        mp -= 20;
-        actions = " heal " + ally.name + " on " + -currentHeal;
+        mp -= maxMp / 6;
+        actions = "heal " + ally.name + " on " + -currentHeal;
     }
 }
