@@ -12,7 +12,7 @@ public class Sniper extends Archer{
 
     @Override
     public String toString() {
-        return ("Sniper " + super.toString() + " Act: " + actions);
+        return ("Sniper " + super.toString() + " ↑" + arrows + ": " + actions);
     }
 
     @Override
